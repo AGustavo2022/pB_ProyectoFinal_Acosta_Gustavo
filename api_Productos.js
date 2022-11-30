@@ -21,3 +21,7 @@ export function putProductos(id) {
     return productos.putId(id)
 }
 
+export function deleteProductos(id) {
+    return productos.deleteById(id)
+}
+
