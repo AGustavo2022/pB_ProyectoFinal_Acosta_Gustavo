@@ -1,31 +1,39 @@
+import fs from 'fs'
 
 export default class ContenedorProductos {
     #elemento
+    #ruta
     constructor(){
         this.#elemento = []
+        this.#ruta = './productos.txt'
     }
 
-    save(elem){
-        this.#elemento.push(elem)
+    async save(elemento){
+        this.#elemento.push(elemento)
+        await fs.promises.writeFile(this.#ruta, JSON.stringify(this.#elemento))
     }
 
-    getById(number){
-        const arrId = this.#elemento.find(el => number === el.id)
+    async getById(number){
+        const leerArchivo = await fs.promises.readFile(this.#ruta, 'utf-8')
+        const arr = JSON.parse(leerArchivo)
+        const arrId =  arr.find(el => number === el.id)
         return (arrId !== undefined)?arrId:null
     }
 
-    getAll(){
+    async getAll(){
+        this.#elemento = JSON.parse(await fs.promises.readFile(this.#ruta, 'utf-8'))
         return this.#elemento
     }
 
-    putId(number) {
-        const indiceBuscado = this.#elemento.findIndex(c => c.id === number);
-        return indiceBuscado
+    async deleteById(number){
+        const leerArchivo = await fs.promises.readFile(this.#ruta, 'utf-8')
+        const arr = JSON.parse(leerArchivo)
+        const posicion =  arr.findIndex(el => el.id === number)
+        arr.splice(posicion,1)
+        await fs.promises.writeFile(this.#ruta, JSON.stringify(arr))
     }
 
-    deleteById(number){
-        const posicion =  this.#elemento.findIndex(el => el.id === number)
-        this.#elemento.splice(posicion,1)
+    async deleteAll(){
+        await fs.promises.writeFile(this.#ruta, '[]')
     }
-
 }

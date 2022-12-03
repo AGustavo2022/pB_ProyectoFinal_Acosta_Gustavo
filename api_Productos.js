@@ -1,27 +1,42 @@
+import fs from 'fs'
 import crypto from 'crypto'
-import ContenedorProductos from './contenedor.js';
 
-const productos = new ContenedorProductos()
 
-export function getPoductos() {
-    return productos.getAll()
+
+function productos () {
+    const data = JSON.parse(fs.readFileSync('./productos.txt', 'utf-8'))
+    return data
 }
 
-export function getPoductosId(id) {
-    return productos.getById(id)
+const producto = productos()
+
+
+export function controladorGetProducto() {
+    const data = producto
+    data.map(e => {e.id = crypto.randomUUID()})
+    return data
 }
 
-export function postProductos(datos) {
-    datos.id = crypto.randomUUID()
-    productos.save(datos)
-    return datos
+export function controladorGetProductosSegunId(id) {
+    const buscado = producto.find(c => c.id == id);
+    console.log(buscado)
+    return buscado
 }
 
-export function putProductos(id) {
-    return productos.putId(id)
+export function controladorPostProductos(datos) {
+    const productoNuevo = datos;
+    productoNuevo.id = crypto.randomUUID();
+    producto.push(productoNuevo);
+    return producto
 }
 
-export function deleteProductos(id) {
-    return productos.deleteById(id)
+export function controladorPutProductosSegunId(id) {
+    const indiceBuscado = producto.findIndex(c => c.id === id );
+    return indiceBuscado
 }
 
+export function controladorDeleteProductosSegunId(id) {
+    const indiceBuscado = producto.findIndex(c => c.id === id);
+    const borrados = producto.splice(indiceBuscado, 1);
+    return {indiceBuscado, borrados}
+}

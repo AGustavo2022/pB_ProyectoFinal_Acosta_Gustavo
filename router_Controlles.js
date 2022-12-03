@@ -24,23 +24,30 @@ routerCosas.post('/logout', (req, res) => {
 })
 
 routerCosas.get('/', (req, res) => {
-    const cosas = cosasApi.getPoductos()
+    const cosas = cosasApi.controladorGetProducto()
+    res.status(201)
     res.json(cosas)
 })
 
 routerCosas.get('/:id', ({ params: {id } }, res) => {
-    const cosas = cosasApi.getPoductosId(id)
-    res.json(cosas)
+    const cosas = cosasApi.controladorGetProductosSegunId(id)
+    if (!cosas) {
+        res.status(404);
+        res.json({ error: `Producto no encontrado (${id})`});
+    } else {
+        res.json(cosas);
+    }
 })
 
-routerCosas.post('/', soloParaAdmins, async (req, res) => {
-    const cosaCreada = await cosasApi.postProductos(req.body)
+routerCosas.post('/', soloParaAdmins, (req, res) => {
+    const cosaCreada = cosasApi.controladorPostProductos(req.body)
+    res.status(201)
     res.json(cosaCreada)
 })
 
 routerCosas.put('/:id', soloParaAdmins,({ body, params: { id } }, res) => {
-    const indiceBuscado = cosasApi.putProductos(id);
-    console.log(indiceBuscado)
+    const indiceBuscado = cosasApi.controladorPutProductosSegunId(id);
+    const cosaCreada = []
     if (indiceBuscado === -1) {
         res.status(404);
         res.json({ error: `Producto no encontrado (${id})`});
@@ -51,13 +58,12 @@ routerCosas.put('/:id', soloParaAdmins,({ body, params: { id } }, res) => {
 })
 
 routerCosas.delete('/:id', soloParaAdmins, ({ params: { id } }, res) => {
-    const indiceBuscado = cosasApi.deleteProductos(id);
+    const indiceBuscado = cosasApi.controladorDeleteProductosSegunId(id);
     if (indiceBuscado === -1) {
         res.status(404);
         res.json({ error: `Producto no encontrado (${id})`});
     } else {
-        const borrados = producto.splice(indiceBuscado, 1);
         res.sendStatus(204)
-        res.json(borrados[0]);
+        res.json(borrados);
     }
 })
