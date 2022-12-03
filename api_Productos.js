@@ -1,10 +1,10 @@
 import fs from 'fs'
 import crypto from 'crypto'
 
-
+const rutaArchivo = './productos.txt'
 
 function productos () {
-    const data = JSON.parse(fs.readFileSync('./productos.txt', 'utf-8'))
+    const data = JSON.parse(fs.readFileSync(rutaArchivo, 'utf-8'))
     return data
 }
 
@@ -13,7 +13,6 @@ const producto = productos()
 
 export function controladorGetProducto() {
     const data = producto
-    data.map(e => {e.id = crypto.randomUUID()})
     return data
 }
 
@@ -38,5 +37,6 @@ export function controladorPutProductosSegunId(id) {
 export function controladorDeleteProductosSegunId(id) {
     const indiceBuscado = producto.findIndex(c => c.id === id);
     const borrados = producto.splice(indiceBuscado, 1);
+    fs.promises.writeFile(rutaArchivo, JSON.stringify(borrados))
     return {indiceBuscado, borrados}
 }

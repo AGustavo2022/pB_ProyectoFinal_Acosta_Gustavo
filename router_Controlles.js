@@ -1,7 +1,9 @@
 import { Router } from 'express'
 import * as cosasApi from './api_Productos.js'
+import fs from 'fs'
 
 export const routerCosas = Router()
+const rutaArchivo = './productos.txt'
 
 let esAdmin = false
 
@@ -43,6 +45,7 @@ routerCosas.post('/', soloParaAdmins, (req, res) => {
     const cosaCreada = cosasApi.controladorPostProductos(req.body)
     res.status(201)
     res.json(cosaCreada)
+    fs.promises.writeFile(rutaArchivo, JSON.stringify(cosaCreada))
 })
 
 routerCosas.put('/:id', soloParaAdmins,({ body, params: { id } }, res) => {
@@ -53,7 +56,7 @@ routerCosas.put('/:id', soloParaAdmins,({ body, params: { id } }, res) => {
         res.json({ error: `Producto no encontrado (${id})`});
     } else {
         cosaCreada[indiceBuscado] = body;
-        res.json(body);
+        res.json(cosaCreada[indiceBuscado]);
     }
 })
 
@@ -64,6 +67,5 @@ routerCosas.delete('/:id', soloParaAdmins, ({ params: { id } }, res) => {
         res.json({ error: `Producto no encontrado (${id})`});
     } else {
         res.sendStatus(204)
-        res.json(borrados);
     }
 })
